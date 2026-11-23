@@ -1,0 +1,36 @@
+{
+  "name": "codearts-openai-gateway",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Expose Huawei Cloud CodeArts models as an OpenAI-compatible API, reusing the dsh-codearts plugin's signing, token refresh and account rotation.",
+  "keywords": [
+    "codearts",
+    "huaweicloud",
+    "openai-compatible",
+    "gateway",
+    "reverse-proxy",
+    "llm"
+  ],
+  "author": "YG",
+  "license": "MIT",
+  "bin": {
+    "codearts-gateway": "./src/gateway.mjs"
+  },
+  "scripts": {
+    "start": "node src/gateway.mjs",
+    "check": "node scripts/check.mjs",
+    "setup": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/setup-vendor.ps1"
+  },
+  "engines": {
+    "node": ">=20.11"
+  },
+  "files": [
+    "src",
+    "scripts",
+    "docs",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ]
+}

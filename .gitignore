@@ -1,0 +1,20 @@
+# 依赖与本地产物
+node_modules/
+
+# scripts/setup-vendor.ps1 生成的插件副本（第三方产物，不进仓库）
+vendor/
+
+# 本地密钥与运行产物
+.env
+.gateway-key
+*.log
+*.pid
+.gateway-*.json
+
+# 编辑器 / 系统
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp

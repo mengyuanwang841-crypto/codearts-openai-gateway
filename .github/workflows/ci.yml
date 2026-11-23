@@ -1,0 +1,30 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: ['20', '22', '24']
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Syntax + unit checks
+        run: node scripts/check.mjs
+
+      - name: CLI flags
+        run: |
+          node src/gateway.mjs --version
+          node src/gateway.mjs --help > /dev/null
+
+      - name: Shell script syntax
+        run: bash -n scripts/setup-vendor.sh
