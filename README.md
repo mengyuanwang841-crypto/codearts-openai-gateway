@@ -148,6 +148,55 @@ Cline / Roo Code / Continue：Provider 选 `OpenAI Compatible`，其余同上，
 两条硬要求：**边界必须 TLS**、**必须关掉响应缓冲**（`flush_interval -1` / `proxy_buffering off`），
 否则流式会被攒着发。
 
+## 开机自启
+
+```powershell
+# 网关 + 隧道一起随登录启动（推荐）
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\install-autostart.ps1
+
+# 只启网关，不开隧道
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\install-autostart.ps1 -NoTunnel
+```
+
+触发时机是**登录时**而不是开机时：凭证在 `%USERPROFILE%\.dsh\.codearts-accounts.json`，
+SYSTEM 账户读不到，开在 boot 阶段会直接 `signedIn:false`。
+
+脚本按顺序尝试两种机制：
+
+1. `schtasks /sc onlogon` —— 若被组策略拒绝（`ERROR: Access is denied.`），
+2. 自动退回**启动文件夹**里放一个隐藏窗口的 VBS：
+   `%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\CodeArts-Gateway.vbs`
+
+`boot.ps1` 是幂等的：端口已在监听、`cloudflared` 已在跑，就什么都不做，不会起第二份。
+
+```powershell
+powershell -File scripts\boot.ps1 -WithTunnel   # 手动跑一次（等同开机时的行为）
+powershell -File scripts\uninstall-autostart.ps1  # 取消自启
+```
+
+## 固定公网地址
+
+`scripts/tunnel.ps1` 用的是 Cloudflare **quick tunnel**，免费、不用账号，但**每次启动域名都会变**
+（`https://随机词-随机词-….trycloudflare.com`）。当前地址随时写在仓库根的 `current-url.txt`。
+
+要一个重启也不变的地址，需要**绑定自己的域名**（Cloudflare 免费计划即可）：
+
+```powershell
+# 1. 一次性：浏览器里登录 Cloudflare
+tools\cloudflared.exe tunnel login
+
+# 2. 建命名隧道 + 绑域名 + 写 config.yml
+powershell -File scripts\setup-named-tunnel.ps1 -Hostname api.example.com
+
+# 3. 装成 Windows 服务（需要管理员终端），以后开机自动连，地址永远不变
+tools\cloudflared.exe --config "$env:USERPROFILE\.cloudflared\config.yml" service install
+Start-Service cloudflared
+```
+
+之后客户端就用 `https://api.example.com/v1`，与重启无关。
+没有域名的话，另一条等价路线是 VPS + frp（见 [docs/DEPLOY.md](docs/DEPLOY.md)）。
+
+
 ## 已知限制
 
 | 项 | 说明 |

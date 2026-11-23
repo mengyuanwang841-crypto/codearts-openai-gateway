@@ -10,6 +10,11 @@ vendor/
 *.log
 *.pid
 .gateway-*.json
+current-url.txt
+logs/
+
+# 反代工具二进制（scripts 会按需下载，别进仓库）
+tools/
 
 # 编辑器 / 系统
 .DS_Store
