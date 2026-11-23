@@ -151,11 +151,11 @@ Cline / Roo Code / Continue：Provider 选 `OpenAI Compatible`，其余同上，
 ## 开机自启
 
 ```powershell
-# 网关 + 隧道一起随登录启动（推荐）
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts\install-autostart.ps1
-
-# 只启网关，不开隧道
+# 只启动网关（默认用法：自己电脑上用）
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts\install-autostart.ps1 -NoTunnel
+
+# 网关 + 隧道一起随登录启动（如果你想长期挂个公网地址）
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts\install-autostart.ps1
 ```
 
 触发时机是**登录时**而不是开机时：凭证在 `%USERPROFILE%\.dsh\.codearts-accounts.json`，
@@ -174,12 +174,40 @@ powershell -File scripts\boot.ps1 -WithTunnel   # 手动跑一次（等同开机
 powershell -File scripts\uninstall-autostart.ps1  # 取消自启
 ```
 
-## 固定公网地址
+## 分享给别人用
+
+默认 `.env` 里 `HOST=127.0.0.1`：只有本机能访问，局域网和公网都进不来。
+偶尔要给朋友/别的机器用时，临时开一条隧道，用完关掉：
+
+```powershell
+scripts\share.cmd        # 或 powershell -File scripts\share.ps1
+```
+
+它会：起网关（若没起）→ 开 Cloudflare 临时隧道 → 把「Base URL / API Key / 模型 / curl 示例」
+**打印出来并复制到剪贴板**，你直接粘给对方。
+
+```powershell
+scripts\unshare.cmd      # 关隧道，公网地址立即失效
+```
+
+隧道地址每次都不一样，这在这里正好：不分享的时候外面根本不存在这个地址。
+
+分享完想收回对方的访问权（例如对方把 key 漏出去了）：
+
+```powershell
+powershell -File scripts\rotate-key.ps1   # 生成新 key 并重启网关
+```
+
+也可以换成对方只在局域网里用 —— 把 `.env` 的 `HOST` 改成 `0.0.0.0` 重启，然后给
+`http://<你的内网IP>:8787/v1`（路由器会挡住外网，安全性和公网完全不同）。
+
+## 固定公网地址（一般不需要）
 
 `scripts/tunnel.ps1` 用的是 Cloudflare **quick tunnel**，免费、不用账号，但**每次启动域名都会变**
 （`https://随机词-随机词-….trycloudflare.com`）。当前地址随时写在仓库根的 `current-url.txt`。
 
-要一个重启也不变的地址，需要**绑定自己的域名**（Cloudflare 免费计划即可）：
+只有当你需要「一个永久地址天天挂」时，才值得绑域名（Cloudflare 免费计划即可）：
+
 
 ```powershell
 # 1. 一次性：浏览器里登录 Cloudflare
