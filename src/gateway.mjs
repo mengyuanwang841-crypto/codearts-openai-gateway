@@ -217,16 +217,24 @@ const server = createServer(async (req, res) => {
     if (path === '/healthz' || path === '/') {
       let accounts = []
       try { accounts = await store.list() } catch {}
+      // 不带凭据时只给最小信息：公网暴露时 /healthz 会被任何扫描器打到，
+      // 账号 id 与用户名属于内部信息，只有带 key 且显式 ?detail=1 才返回。
+      const wantsDetail = new URL(req.url ?? '/', 'http://localhost').searchParams.get('detail') === '1'
+      const showDetail = wantsDetail && authorized(req)
       sendJson(res, 200, {
         ok: true,
         version: VERSION,
         signedIn: accounts.length > 0,
-        accounts: accounts.map((account) => ({
-          id: account.id,
-          userName: account.userName,
-          stale: account.stale,
-        })),
         models: catalog.current().length,
+        ...(showDetail
+          ? {
+            accounts: accounts.map((account) => ({
+              id: account.id,
+              userName: account.userName,
+              stale: account.stale,
+            })),
+          }
+          : {}),
       })
       return
     }

@@ -91,6 +91,13 @@ curl -s http://127.0.0.1:8787/v1/models -H "Authorization: Bearer $(cat .gateway
 
 第一行 `signedIn:false` 就是还没登录，回 DSH 里登录 CodeArts 卡片再重试。
 
+`/healthz` **不需要鉴权**，因此只返回最小信息（`ok` / `signedIn` / 模型数），
+不暴露账号 id 与用户名。要看账号细节得带 key 并显式加 `?detail=1`：
+
+```bash
+curl -s "http://127.0.0.1:8787/healthz?detail=1" -H "Authorization: Bearer $(cat .gateway-key)"
+```
+
 ## 配置
 
 优先级：**环境变量 > `.env` > 默认值**。把 `.env.example` 复制成 `.env` 改就行。
