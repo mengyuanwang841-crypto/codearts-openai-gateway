@@ -1,5 +1,9 @@
 # CodeArts OpenAI Gateway
 
+[![ci](https://github.com/mengyuanwang841-crypto/codearts-openai-gateway/actions/workflows/ci.yml/badge.svg)](https://github.com/mengyuanwang841-crypto/codearts-openai-gateway/actions/workflows/ci.yml)
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![node](https://img.shields.io/badge/node-%3E%3D20.11-informational.svg)](package.json)
+
 把华为云 **CodeArts** 的模型（GLM-5.2/5.3、DeepSeek-V4.1、Kimi-K3、盘古 …）包成一个标准
 **OpenAI `/v1` 接口**，给任何客户端用：Cherry Studio、ChatBox、Cline、Cursor、OpenAI SDK、你自己的脚本。
 
@@ -55,7 +59,7 @@ CodeArts  /api/v2/chat/completions
 ### Windows
 
 ```powershell
-git clone <你的仓库地址> codearts-openai-gateway
+git clone https://github.com/mengyuanwang841-crypto/codearts-openai-gateway.git
 cd codearts-openai-gateway
 
 # 1. 把已安装的插件产物与它依赖的 @deepseek-ai 包接进来（生成 vendor/，不进仓库）
@@ -70,7 +74,8 @@ Windows 上没有 `node` 在 PATH 也能跑：`start.cmd` 会退回到 DSH 自�
 ### Linux / macOS
 
 ```bash
-git clone <你的仓库地址> && cd codearts-openai-gateway
+git clone https://github.com/mengyuanwang841-crypto/codearts-openai-gateway.git
+cd codearts-openai-gateway
 bash scripts/setup-vendor.sh
 node src/gateway.mjs
 ```
